@@ -60,12 +60,30 @@ TEST(HDWallet, createFromMnemonic) {
         EXPECT_EQ(hex(wallet.getEntropy()), "ba5821e8c356c05ba5f025d9532fe0f21f65d594");
         EXPECT_EQ(hex(wallet.getSeed()), "354c22aedb9a37407adc61f657a6f00d10ed125efa360215f36c6919abd94d6dbc193a5f9c495e21ee74118661e327e84a5f5f11fa373ec33b80897d4697557d");
     }
+    {   // Invalid mnemonic is accepted, a seed is generated, but no entropy
+        HDWallet wallet = HDWallet("THIS IS AN INVALID MNEMONIC", "");
+        EXPECT_EQ(wallet.getMnemonic(), "THIS IS AN INVALID MNEMONIC");
+        EXPECT_EQ(wallet.getPassphrase(), "");
+        EXPECT_EQ(hex(wallet.getEntropy()), "");
+        EXPECT_EQ(hex(wallet.getSeed()), "3fb32097d29d7474149fea641b87feb1778cd6df0748a2e11145e8db5f2b000ecdc7d4d14fefe8a7e0ecede14d80083e4d7976c5d807e352351b7407a5af0c08");
+    }
 }
 
 TEST(HDWallet, createFromSpanishMnemonic) {
+    // Non-English mnemonic is accepted, but there is not dictionary; a seed is generated, but entropy will be empty
     {
         HDWallet wallet = HDWallet("llanto radical atraer riesgo actuar masa fondo cielo dieta archivo sonrisa mamut", "");
         EXPECT_EQ(hex(wallet.getSeed()), "ec8f8703432fc7d32e699ee056e9d84b1435e6a64a6a40ad63dbde11eab189a276ddcec20f3326d3c6ee39cbd018585b104fc3633b801c011063ae4c318fb9b6");
+        EXPECT_EQ(hex(wallet.getEntropy()), "");
+        EXPECT_EQ(hex(wallet.getMasterKey(TWCurveED25519).bytes), "d96277a61725f84e3772ee31688fcb9752eb6db1f78c1279b7a9c2a8622a8264");
+        EXPECT_EQ(hex(wallet.getMasterKey(TWCurveED25519Extended).bytes), "90bb5c5f1463c8e917a4c41a9dfac1521011d939dbb105737d34d14cea8ea859");
+    }
+    {
+        HDWallet wallet = HDWallet("careta llanto jefe tarjeta tren osadía carga alejar banda recurso águila macho", "");
+        EXPECT_EQ(hex(wallet.getSeed()), "c416d18e4d88a0d789dd3f5a182df48cd871760722813b975b38c755c12148a3f361d5518c0535c1a94f186747072e4a0588e28c30eeae7a408a9d79bf7a032c");
+        EXPECT_EQ(hex(wallet.getEntropy()), "");
+        EXPECT_EQ(hex(wallet.getMasterKey(TWCurveED25519).bytes), "9c367f46413e69ae3ffb2ae81a75151fa3ffe7bb13b553f77df8cb4a598ba8f7");
+        EXPECT_EQ(hex(wallet.getMasterKey(TWCurveED25519Extended).bytes), "90bb5c5f1463c8e917a4c41a9dfac1521011d939dbb105737d34d14cea8ea859");
     }
 }
 
